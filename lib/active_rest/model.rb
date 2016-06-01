@@ -41,7 +41,7 @@ module ActiveRest
         action_name = :update
       end
 
-      from_remote(self.class.parse(response))
+      from_remote(self.class.parse(action_name, response.body))
       self.class.proxy.routes[action_name].success?(response.status)
     end
 
@@ -69,6 +69,8 @@ module ActiveRest
     end
 
     def from_remote hash
+      return self if hash.nil?
+
       self.class.attributes.keys.each do |attribute|
         send("#{attribute}=", hash[( self.class.attributes[attribute][:remote_name] || attribute ).to_s])
       end
@@ -78,20 +80,14 @@ module ActiveRest
 
     included do
 
-      def self.parse response
-        return {} if [nil, ''].include?(response.body)
-        Parser.parse(parser, response.body)
+      def self.parse action, body
+        raise NotImplementedError.new
       end
 
-      def self.parse_and_initialize response
-        parsed = parse(response)
-        return initialize_many_from_remote(parsed, response) if parsed.is_a? Array
-        return initialize_from_remote(parsed, response)
-      end
-
-      def self.parser parser = nil
-        @parser = parser unless parser.nil?
-        @parser
+      def self.parse_and_initialize action, body
+        parsed = parse(action, body)
+        return initialize_many_from_remote(parsed) if parsed.is_a? Array
+        return initialize_from_remote(parsed)
       end
 
       def self.all
@@ -100,7 +96,7 @@ module ActiveRest
 
       def self.find options
         response = proxy.find(options)
-        parse_and_initialize(response)
+        parse_and_initialize(:find, response.body)
       end
 
       def self.build_error_message response
@@ -111,14 +107,14 @@ module ActiveRest
         @connection = connection
       end
 
-      def self.initialize_from_remote hash, response
+      def self.initialize_from_remote hash
+        return nil if hash.nil?
         model = self.new
         model.from_remote(hash)
-        model if hash.any?
       end
 
-      def self.initialize_many_from_remote array, response
-        array.map { |item| self.initialize_from_remote(item, response)  }
+      def self.initialize_many_from_remote array
+        array.map { |item| self.initialize_from_remote(item)  }
       end
 
       def self.limit limit = @limit

@@ -14,9 +14,9 @@ module ActiveRest
 
         class User
           include ActiveRest::Model
+          include ActiveRest::Model::BasicJsonParser
 
           connection UserConnection
-          parser :json
 
           field :id     , type: Integer
           field :name   , type: String
@@ -110,7 +110,7 @@ module ActiveRest
         end
 
         it "not found" do
-          UserConnection.stubs.get('/users/55') { [404, {}, nil] }
+          UserConnection.stubs.get('/users/55') { [404, {}, ''] }
 
           user = User.find({ id: 55 })
 
@@ -120,7 +120,7 @@ module ActiveRest
         end
 
         it "server error" do
-          UserConnection.stubs.get('/users/666') { [500, {}, nil] }
+          UserConnection.stubs.get('/users/666') { [500, {}, ''] }
 
           expect {
             user = User.find({ id: 666 })
@@ -199,7 +199,6 @@ module ActiveRest
             include ActiveRest::Model
 
             connection UserConnection
-            parser :json
 
             field :id     , type: Integer
             field :name   , type: String
@@ -270,10 +269,9 @@ module ActiveRest
 
           class ::Brand
             include ActiveRest::Model
+            include ActiveRest::Model::BasicJsonParser
 
             connection BelongsToConnection
-
-            parser :json
 
             field :id, type: String 
             field :name, type: String
@@ -283,10 +281,9 @@ module ActiveRest
 
           class ::Product
             include ActiveRest::Model
+            include ActiveRest::Model::BasicJsonParser
 
             connection BelongsToConnection
-
-            parser :json
 
             belongs_to :brand
 
@@ -345,10 +342,9 @@ module ActiveRest
 
           class ::Tag
             include ActiveRest::Model
+            include ActiveRest::Model::BasicJsonParser
 
             connection HasManyConnection
-
-            parser :json
 
             belongs_to :post
 
@@ -361,10 +357,9 @@ module ActiveRest
 
           class ::Post
             include ActiveRest::Model
+            include ActiveRest::Model::BasicJsonParser
 
             connection HasManyConnection
-
-            parser :json
 
             has_many :tags, class_name: 'Tag'
 

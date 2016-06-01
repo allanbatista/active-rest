@@ -30,7 +30,7 @@ module ActiveRest
     def each
       loop do
         response = @model.proxy.list(@limit, @offset, options)
-        itens    = @model.parse_and_initialize(response)
+        itens    = @model.parse_and_initialize(:list, response.body)
 
         break if itens.empty?
         @offset += 1
@@ -43,7 +43,7 @@ module ActiveRest
 
       loop do
         response = @model.proxy.list(@limit, @offset, options)
-        itens    = @model.parse_and_initialize(response)
+        itens    = @model.parse_and_initialize(:list, response.body)
 
         break if itens.empty?
         @offset += 1
