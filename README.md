@@ -5,7 +5,7 @@
 Add this line to your application's Gemfile:
 
 ```ruby
-gem 'active_rest'
+gem 'active_rest', github: 'allanbatista/active-rest'
 ```
 
 And then execute:
@@ -18,15 +18,19 @@ Or install it yourself as:
 
 ## Usage
 
+This Gem was created to make integrate with rest api easy.
+
 ### Create a Connection
 
-A Authentication are used to permit a encapsuled a authentication API.
+A Authentication are used to permit a encapsuled a authentication API with pattern Singleton.
 
     require 'active_rest'
 
-    class SkyhubAuthentication < Authentication
+    class SkyhubAuthentication < ActiveRest::Authentication
       def authenticate! path = nil, params = nil, headers = nil
-        connection.headers['X-Auth-Token'] = 'SERCRET_TOKEN'
+        connection.headers['X-User-Email'] = 'email@example.com.br'
+        connection.headers['X-User-Token'] = 'token'
+        true
       end
     end
 
@@ -36,9 +40,7 @@ A Connection are used do explain where and how the API should be connect.
 
     module SkyhubConnection
       extend Connection
-
       authentication SkyhubAuthentication
-
       port 443
       host 'in.skyhub.com.br'
       protocol 'https'
@@ -48,17 +50,43 @@ Create a resource
 
     require 'active_rest'
 
-    class Product
-      include ActiveRest::Model
+    module SkyhubApi
+      class SkyhubProduct
+        include ActiveRest::Model
 
-      connection UserConnection
-      parser :json
+        connection SkyhubConnection
+        resources '/products', options: { offset: 'page', limit: 'per_page' }
+        route :update , "/products/:id", { method: 'put' , success: 204 }
 
-      field :id     , type: String
-      field :name   , type: String
-      field :idade  , type: Integer
+        field :id, type: String, remote_name: 'sku'
+        field :name, type: String
+        field :description, type: String
+        field :status, type: String, default: 'enabled'
+        field :brand , type: String
+        field :ean, type: String
+        field :nbm, type: String
+        field :qty, type: Integer, default: 0
+        field :price, type: 0.0
+        field :promotional_price, type: Float, default: 0.0
+        field :cost, type: Integer
+        field :weight, type: Float, default: 0.0
+        field :height, type: Float, default: 0.0
+        field :length, type: Float, default: 0.0
+        field :width , type: Float, default: 0.0
+        field :images, type: Array, default: []
+        field :specifications, type: Array, default: []
 
-	  resources :products
+        def self.parse action, body
+          if action.to_s == 'list'
+            parsed = JSON.parse(body)
+            parsed['products']
+          elsif ['create', 'update'].include?(action.to_s)
+            {}
+          else
+            JSON.parse(body)
+          end
+        end
+      end
     end
 
 After that definations, are possível start to use.

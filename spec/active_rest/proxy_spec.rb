@@ -82,6 +82,16 @@ module ActiveRest
 
           UserConnection.stubs.verify_stubbed_calls
         end
+
+        it "should list users with json error" do
+          UserConnection.stubs.get('/users?page=1&per_page=20') { [200, {}, 'INVALID_JSON'] }
+
+          expect {
+            User.all.to_a
+          }.to raise_error(JSON::ParserError)
+
+          UserConnection.stubs.verify_stubbed_calls
+        end
       end
 
       context ".find" do
@@ -94,6 +104,16 @@ module ActiveRest
           expect( user.idade ).to eq(24)
           expect( user.wallet ).to eq(0.0)
           expect( user.things ).to eq(['oi'])
+
+          UserConnection.stubs.verify_stubbed_calls
+        end
+
+        it "error parser" do
+          UserConnection.stubs.get('/users/1') { [200, {}, 'INVALID_JSON'] }
+
+          expect {
+            user = User.find({ id: 1 })
+          }.to raise_error(JSON::ParserError)
 
           UserConnection.stubs.verify_stubbed_calls
         end

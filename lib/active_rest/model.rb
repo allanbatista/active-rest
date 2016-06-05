@@ -48,6 +48,7 @@ module ActiveRest
 
         from_remote(self.class.parse(action_name, response.body))
         persist!
+
         true
       rescue ActiveRest::Error::ResponseError => e
         add_errors(self.class.parse_error(e.response))
@@ -80,16 +81,6 @@ module ActiveRest
         obj
       end
 
-      def self.parse action, body
-        raise NotImplementedError.new
-      end
-
-      def self.parse_and_initialize action, body
-        parsed = parse(action, body)
-        return initialize_many_from_remote(parsed) if parsed.is_a? Array
-        return initialize_from_remote(parsed)
-      end
-
       def self.all
         Iterator.new( self )
       end
@@ -101,6 +92,22 @@ module ActiveRest
 
       def self.connection connection = @connection
         @connection = connection
+      end
+
+      ##
+      # this method expect receive a hash.
+      #
+      # example:
+      #
+      #     { "name" => "Allan" }
+      def self.parse action, body
+        raise NotImplementedError.new
+      end
+
+      def self.parse_and_initialize action, body
+        parsed = parse(action, body)
+        return initialize_many_from_remote(parsed) if parsed.is_a? Array
+        return initialize_from_remote(parsed)
       end
 
       def self.initialize_from_remote hash
