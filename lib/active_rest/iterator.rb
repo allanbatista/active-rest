@@ -35,6 +35,7 @@ module ActiveRest
         break if itens.empty?
         @offset += 1
         itens.each { |item| yield(item) }
+        break if itens.size < @limit
       end
     end
 
@@ -48,6 +49,7 @@ module ActiveRest
         break if itens.empty?
         @offset += 1
         array += itens
+        break if itens.size < @limit
       end
 
       array

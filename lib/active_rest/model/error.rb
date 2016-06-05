@@ -23,6 +23,16 @@ module ActiveRest
         errors = []
       end
 
+      included do
+        def self.parse_error response
+          errors = []
+
+          errors << ActiveRest::Response.messages(response.status)
+          errors << response.body if response.body.to_s.strip != ''
+
+          errors
+        end
+      end
     end
   end
 end

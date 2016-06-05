@@ -8,7 +8,6 @@ module ActiveRest
         module UserConnection
           extend Connection
 
-          enable_stubs!
           host 'localhost'
         end
 
@@ -34,7 +33,11 @@ module ActiveRest
           route :update , '/users/:id', success: 204, method: :patch, data_type: :json
           route :destroy, '/users/:id', success: 204, method: :delete
         end
+
+        UserConnection.enable_stubs!
       end
+
+      after  { UserConnection.disable_stubs! }
 
       it "should create model with connection" do
         expect( User.connection.host ).to eq('localhost')
@@ -56,7 +59,6 @@ module ActiveRest
         
         it "should list users" do
           UserConnection.stubs.get('/users?page=1&per_page=20') { [200, {}, '[{"id":1,"name":"Allan","idade":24,"outher_things":["oi"]},{"id":2,"name":"Lucas","wallet":25.75}]'] }
-          UserConnection.stubs.get('/users?page=2&per_page=20') { [200, {}, '[]'] }
 
           users = User.all.to_a
 
@@ -188,6 +190,7 @@ module ActiveRest
 
           user = User.new(id: 1, name: "Allan")
           user.wallet = 15.0
+          user.persist!
 
           expect( user.save ).to eq(true)
 
@@ -220,6 +223,7 @@ module ActiveRest
 
           user = User.new(id: 1, name: "Allan")
           user.wallet = 15.0
+          user.persist!
 
           expect( user.save ).to eq(true)
 
@@ -373,7 +377,6 @@ module ActiveRest
 
         it "should return a list of tags" do
           HasManyConnection.stubs.get('/posts/123/tags?page=1&per_page=20') { [200, {}, [{ id: '1', key: 'color', post_id: '123' }, { id: '2', key: 'size', post_id: '123' }, { id: '3', key: 'gender', post_id: '123' }].to_json] }
-          HasManyConnection.stubs.get('/posts/123/tags?page=2&per_page=20') { [200, {}, '[]'] }
           HasManyConnection.stubs.get('/posts/123') { [200, {}, {id: '123', title: 'My Blog Post', body: 'Lorem ipsum dolor sit amet, consectetur adipisicing elit. Perferendis quaerat fugiat libero nemo, aspernatur soluta facere est asperiores autem possimus, voluptas, pariatur. Accusamus eveniet, aut aliquam suscipit perferendis sapiente eaque!'}.to_json] }
 
           post = Post.new( id: '123', title: 'My Blog Post', body: 'Lorem ipsum dolor sit amet, consectetur adipisicing elit. Perferendis quaerat fugiat libero nemo, aspernatur soluta facere est asperiores autem possimus, voluptas, pariatur. Accusamus eveniet, aut aliquam suscipit perferendis sapiente eaque!' )

@@ -25,22 +25,28 @@ module ActiveRest
     end
 
     def create obj
-      method_with_body(routes[:create], obj)
+      route = routes[:create]
+      response = method_with_body(route, obj)
+      route.valid_response(response)
+      response
     end
 
     def update obj
-      method_with_body(routes[:update], obj)
+      route = routes[:update]
+      response = method_with_body(route, obj)
+      route.valid_response(response)
+      response
     end
 
     def destroy obj
       route  = routes[:destroy]
-      response = @model.connection.send( route.method, path_replace_variables(obj.to_remote, route.path), route.options)
+      response = @model.connection.send( route.method, path_replace_variables(obj, route.path), route.options)
       route.valid_response(response)
       response
     end
 
     private
-      def path_replace_variables options, path
+      def path_replace_variables object, path       
         splited = path.split('/')
 
         new_path = splited.map do |key|
@@ -48,7 +54,11 @@ module ActiveRest
             key_spplited = key.gsub(':', '').split('.')
             
             new_key = key_spplited.shift
-            new_value = options[new_key.to_sym] || options[new_key]
+            if object.is_a? Hash
+              new_value = object[new_key.to_s] || object[new_key.to_sym]
+            else
+              new_value = object.send(new_key)
+            end
 
             key_spplited.each do |k|
               new_value = new_value.send(k)
@@ -72,7 +82,7 @@ module ActiveRest
           route.headers = { 'Content-Type' => 'application/json' }.merge(route.headers)
         end
 
-        @model.connection.send(route.method, path_replace_variables(obj.to_remote, route.path), body, route.headers)
+        @model.connection.send(route.method, path_replace_variables(obj, route.path), body, route.headers)
       end
   end
 end

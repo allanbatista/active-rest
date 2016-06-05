@@ -33,16 +33,23 @@ module ActiveRest
     ##
     # Deve persistir o objeto
     def save
-      if id.nil?
-        response = self.class.proxy.create(self)
-        action_name = :create
-      else
-        response = self.class.proxy.update(self)
-        action_name = :update
-      end
+      clear_errors
 
-      from_remote(self.class.parse(action_name, response.body))
-      self.class.proxy.routes[action_name].success?(response.status)
+      begin
+        if persisted?
+          response = self.class.proxy.update(self)
+          action_name = :update
+        else
+          response = self.class.proxy.create(self)
+          action_name = :create
+        end
+
+        from_remote(self.class.parse(action_name, response.body))
+        self.class.proxy.routes[action_name].success?(response.status)
+      rescue ActiveRest::Error::ResponseError => e
+        add_errors(self.class.parse_error(e.response))
+        false
+      end
     end
 
     def destroy
@@ -75,7 +82,21 @@ module ActiveRest
         send("#{attribute}=", hash[( self.class.attributes[attribute][:remote_name] || attribute ).to_s])
       end
 
+      persist!
+
       self
+    end
+
+    def persist!
+      @persisted = true
+    end
+
+    def unpersist!
+      @persisted = false
+    end
+
+    def persisted?
+      @persisted || false
     end
 
     included do
@@ -97,10 +118,6 @@ module ActiveRest
       def self.find options
         response = proxy.find(options)
         parse_and_initialize(:find, response.body)
-      end
-
-      def self.build_error_message response
-        MESSAGES[response.status] || "Error on API with status #{response.status} and body: \n#{response.body}"
       end
 
       def self.connection connection = @connection
