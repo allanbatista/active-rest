@@ -29,13 +29,11 @@ module ActiveRest
 
     def each
       loop do
-        response = @model.proxy.list(@limit, @offset, options)
-        itens    = @model.parse_and_initialize(:list, response.body)
+        itens = next_itens
 
-        break if itens.empty?
-        @offset += 1
         itens.each { |item| yield(item) }
-        break if itens.size < @limit
+
+        break if itens.empty? || itens.size < @limit
       end
     end
 
@@ -43,16 +41,21 @@ module ActiveRest
       array = []
 
       loop do
-        response = @model.proxy.list(@limit, @offset, options)
-        itens    = @model.parse_and_initialize(:list, response.body)
+        itens = next_itens
 
-        break if itens.empty?
-        @offset += 1
         array += itens
-        break if itens.size < @limit
+        
+        break if itens.empty? || itens.size < @limit
       end
 
       array
     end
+
+    private
+      def next_itens
+        response = @model.proxy.list(@limit, @offset, options)
+        @offset += 1
+        @model.parse_and_initialize(:list, response.body)
+      end
   end
 end
