@@ -32,7 +32,6 @@ module ActiveRest
           define_method "#{field_name}=" do
             instance_variable_set( "@#{field_name}", obj)
             instance_variable_set( "@#{attribute_name}", obj.id)
-            self
           end
         end
       end

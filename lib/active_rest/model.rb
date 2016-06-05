@@ -1,7 +1,7 @@
 module ActiveRest
   module Model
-    extend ActiveSupport::Concern
-    
+    extend  ActiveSupport::Concern
+
     include ActiveRest::Model::Field
     include ActiveRest::Model::Error
     include ActiveRest::Model::Proxy
@@ -27,6 +27,8 @@ module ActiveRest
         end
       end
 
+      persist!
+
       self
     end
 
@@ -45,7 +47,8 @@ module ActiveRest
         end
 
         from_remote(self.class.parse(action_name, response.body))
-        self.class.proxy.routes[action_name].success?(response.status)
+        persist!
+        true
       rescue ActiveRest::Error::ResponseError => e
         add_errors(self.class.parse_error(e.response))
         false
@@ -55,37 +58,7 @@ module ActiveRest
     def destroy
       response = self.class.proxy.destroy(self)
       self.class.proxy.routes[:destroy].success?(response.status)
-    end
-
-    ##
-    # Gera um Hash que corresponde a estrutura remota do recurso na API.
-    #
-    # Exemplo:
-    #
-    #     object = User.new
-    #     object.to_remote #=> {"name"=>"Allan"}
-    def to_remote
-      hash = {}
-
-      self.class.attributes.keys.each do |attribute_name|
-        attribute = self.class.attributes[attribute_name]
-        hash[( attribute[:remote_name] || attribute_name ).to_s] = self.send(attribute_name)
-      end
-
-      hash
-    end
-
-    def from_remote hash
-      return self if hash.nil?
-
-      self.class.attributes.keys.each do |attribute|
-        send("#{attribute}=", hash[( self.class.attributes[attribute][:remote_name] || attribute ).to_s])
-      end
-
-      persist!
-
-      self
-    end
+    end   
 
     def persist!
       @persisted = true
@@ -100,6 +73,12 @@ module ActiveRest
     end
 
     included do
+      def self.new(*args, &block)
+        obj = self.allocate
+        obj.initialize_defaults
+        obj.send(:initialize, *args, &block)
+        obj
+      end
 
       def self.parse action, body
         raise NotImplementedError.new
@@ -128,6 +107,8 @@ module ActiveRest
         return nil if hash.nil?
         model = self.new
         model.from_remote(hash)
+        model.persist!
+        model
       end
 
       def self.initialize_many_from_remote array
