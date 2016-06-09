@@ -46,6 +46,38 @@ module ActiveRest
           expect( attributes[:id].remote_type ).to eq( String )
         end
 
+        context "#field" do
+          class Thing
+            include ActiveRest::SimpleModule
+            include ActiveRest::Model::BasicJsonParser
+
+            field :key, type: String
+            field :value, type: String
+          end
+
+          class ActiveRestCollectionTest
+            include ActiveRest::Model
+            include ActiveRest::Model::BasicJsonParser
+
+            field :id    , type: Integer
+            field :things, type: Array, as: Thing, default: []
+          end
+
+          it "Array with class" do
+            rest = ActiveRestCollectionTest.new
+
+            rest.things << Thing.new({ key: 'nome', value: 'Allan' })
+
+            expect( rest.to_remote ).to eq({
+              'id' => nil,
+              'things' => [
+                'key' => 'nome',
+                'value' => 'Allan'
+              ]
+            })
+          end
+        end
+
         context "#from_remote" do
           it "should initialize correct" do
             user = User.new

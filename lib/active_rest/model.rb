@@ -3,14 +3,11 @@ module ActiveRest
     extend  ActiveSupport::Concern
 
     include ActiveRest::Model::Field
+    include ActiveRest::Model::Initialize
     include ActiveRest::Model::Error
     include ActiveRest::Model::Proxy
     include ActiveRest::Model::BelongsTo
     include ActiveRest::Model::HasMany
-
-    def initialize attrs = {}
-      attrs.keys.each { |key| self.send("#{key}=", attrs[key]) }
-    end
 
     ##
     # Faz um fetch no servidor e recarrega o objeto atual
@@ -74,13 +71,6 @@ module ActiveRest
     end
 
     included do
-      def self.new(*args, &block)
-        obj = self.allocate
-        obj.initialize_defaults
-        obj.send(:initialize, *args, &block)
-        obj
-      end
-
       def self.all
         Iterator.new( self )
       end
