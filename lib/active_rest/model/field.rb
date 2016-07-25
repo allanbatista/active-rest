@@ -31,7 +31,7 @@ module ActiveRest
           hash[attribute.remote_name] = attribute.to_remote(self.send(attribute.name))
         end
 
-        ActiveRest.hash_keys_to_s(hash)
+        ActiveRest::Utils::Hash.keys_to_s(hash)
       end
 
       def from_remote hash

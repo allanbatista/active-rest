@@ -23,7 +23,7 @@ module ActiveRest
       private
         def normalize type, value, to
           return @default if value.nil?
-
+          
           if type == String
             value.to_s
           elsif type == Integer

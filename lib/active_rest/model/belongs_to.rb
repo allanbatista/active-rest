@@ -17,21 +17,25 @@ module ActiveRest
 
           instance_variable_set( "@#{field_name}", nil)
 
+          ##
+          # Getter
           define_method field_name do
             clazz = class_name.constantize
             
             if instance_variable_get( "@#{field_name}")
               instance_variable_get( "@#{field_name}")
             else
-              obj   = clazz.find({ id: instance_variable_get( "@#{attribute_name}") })
-              instance_variable_set( "@#{field_name}", obj)
+              object = clazz.find({ id: instance_variable_get( "@#{attribute_name}") })
+              instance_variable_set( "@#{field_name}", object)
               instance_variable_get( "@#{field_name}")
             end
           end
 
-          define_method "#{field_name}=" do
-            instance_variable_set( "@#{field_name}", obj)
-            instance_variable_set( "@#{attribute_name}", obj.id)
+          ##
+          # Setter
+          define_method "#{field_name}=" do |object|
+            instance_variable_set( "@#{field_name}", object)
+            instance_variable_set( "@#{attribute_name}", object.id)
           end
         end
       end

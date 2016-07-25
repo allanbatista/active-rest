@@ -1,12 +1,14 @@
 require "active_support"
 require "active_support/inflector"
 require "active_rest/version"
+require "active_rest/utils"
 require "active_rest/response"
 require "active_rest/connection"
 require "active_rest/authentication"
 require "active_rest/authentications/basic"
 require "active_rest/route"
 require "active_rest/proxy"
+require "active_rest/proxy_helper"
 require "active_rest/model/basic_json_parser"
 require "active_rest/model/error"
 require "active_rest/model/attribute"
@@ -22,11 +24,4 @@ require "active_rest/error"
 require "active_rest/errors/response_error"
 
 module ActiveRest
-  def self.capitalize str
-    str.to_s.split('_').collect(&:capitalize).join
-  end
-
-  def self.hash_keys_to_s hash
-    Hash[hash.map{|(k,v)| [k.to_s,v]}]
-  end
 end
