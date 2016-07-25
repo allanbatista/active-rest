@@ -12,6 +12,14 @@ module ActiveRest
       @routes ||= {}
     end
 
+    def find! options = {}
+      begin
+        find(options)
+      rescue ActiveRest::Error::ResponseError => e
+        nil
+      end
+    end
+
     def find options = {}
       route  = routes[:find]
       response = @model.connection.send( route.method, ProxyHelper.replace_path_attributes(options, route.path), route.options)

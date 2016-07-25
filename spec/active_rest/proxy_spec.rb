@@ -28,7 +28,7 @@ module ActiveRest
           field :things , type: Array, default: [], remote_name: 'outher_things'
 
           route :list   , '/users', success: 200..299, method: :get, options: { offset: 'page', limit: 'per_page' }
-          route :find   , '/users/:id', success: ((200..299).to_a + [404]), method: :get
+          route :find   , '/users/:id', success: 200..299, method: :get
           route :create , '/users', success: 201, method: :post, data_type: :json
           route :update , '/users/:id', success: 204, method: :patch, data_type: :json
           route :destroy, '/users/:id', success: 204, method: :delete
@@ -94,6 +94,392 @@ module ActiveRest
         end
       end
 
+      context "Resource Error" do
+        it 'Bad Request' do
+          UserConnection.stubs.get('/users/55') { [400, {}, ''] }
+
+          expect {
+            user = User.find({ id: 55 })
+          }.to raise_error(ActiveRest::Error::BadRequest)
+
+          UserConnection.stubs.verify_stubbed_calls
+        end
+
+        it 'Unauthorized (RFC 7235)' do
+          UserConnection.stubs.get('/users/55') { [401, {}, ''] }
+
+          expect {
+            user = User.find({ id: 55 })
+          }.to raise_error(ActiveRest::Error::Unauthorized)
+
+          UserConnection.stubs.verify_stubbed_calls
+        end
+
+        it 'Payment Required' do
+          UserConnection.stubs.get('/users/55') { [402, {}, ''] }
+
+          expect {
+            user = User.find({ id: 55 })
+          }.to raise_error(ActiveRest::Error::PaymentRequired)
+
+          UserConnection.stubs.verify_stubbed_calls
+        end
+
+        it 'Forbidden' do
+          UserConnection.stubs.get('/users/55') { [403, {}, ''] }
+
+          expect {
+            user = User.find({ id: 55 })
+          }.to raise_error(ActiveRest::Error::Forbidden)
+
+          UserConnection.stubs.verify_stubbed_calls
+        end
+
+        it 'Not Found' do
+          UserConnection.stubs.get('/users/55') { [404, {}, ''] }
+
+          expect {
+            user = User.find({ id: 55 })
+          }.to raise_error(ActiveRest::Error::NotFound)
+
+          UserConnection.stubs.verify_stubbed_calls
+        end
+
+        it 'Method Not Allowed' do
+          UserConnection.stubs.get('/users/55') { [405, {}, ''] }
+
+          expect {
+            user = User.find({ id: 55 })
+          }.to raise_error(ActiveRest::Error::MethodNotAllowed)
+
+          UserConnection.stubs.verify_stubbed_calls
+        end
+
+        it 'Not Acceptable' do
+          UserConnection.stubs.get('/users/55') { [406, {}, ''] }
+
+          expect {
+            user = User.find({ id: 55 })
+          }.to raise_error(ActiveRest::Error::NotAcceptable)
+
+          UserConnection.stubs.verify_stubbed_calls
+        end
+
+        it 'Proxy Authentication Required (RFC 7235)' do
+          UserConnection.stubs.get('/users/55') { [407, {}, ''] }
+
+          expect {
+            user = User.find({ id: 55 })
+          }.to raise_error(ActiveRest::Error::ProxyAuthenticationRequired)
+
+          UserConnection.stubs.verify_stubbed_calls
+        end
+
+        it 'Request Timeout' do
+          UserConnection.stubs.get('/users/55') { [408, {}, ''] }
+
+          expect {
+            user = User.find({ id: 55 })
+          }.to raise_error(ActiveRest::Error::RequestTimeout)
+
+          UserConnection.stubs.verify_stubbed_calls
+        end
+
+        it 'Conflict' do
+          UserConnection.stubs.get('/users/55') { [409, {}, ''] }
+
+          expect {
+            user = User.find({ id: 55 })
+          }.to raise_error(ActiveRest::Error::Conflict)
+
+          UserConnection.stubs.verify_stubbed_calls
+        end
+
+        it 'Gone' do
+          UserConnection.stubs.get('/users/55') { [410, {}, ''] }
+
+          expect {
+            user = User.find({ id: 55 })
+          }.to raise_error(ActiveRest::Error::Gone)
+
+          UserConnection.stubs.verify_stubbed_calls
+        end
+
+        it 'Length Required' do
+          UserConnection.stubs.get('/users/55') { [411, {}, ''] }
+
+          expect {
+            user = User.find({ id: 55 })
+          }.to raise_error(ActiveRest::Error::LengthRequired)
+
+          UserConnection.stubs.verify_stubbed_calls
+        end
+
+        it 'Precondition Failed (RFC 7232)' do
+          UserConnection.stubs.get('/users/55') { [412, {}, ''] }
+
+          expect {
+            user = User.find({ id: 55 })
+          }.to raise_error(ActiveRest::Error::PreconditionFailed)
+
+          UserConnection.stubs.verify_stubbed_calls
+        end
+
+        it 'Payload Too Large (RFC 7231)' do
+          UserConnection.stubs.get('/users/55') { [413, {}, ''] }
+
+          expect {
+            user = User.find({ id: 55 })
+          }.to raise_error(ActiveRest::Error::PayloadTooLarge)
+
+          UserConnection.stubs.verify_stubbed_calls
+        end
+
+        it 'URI Too Long (RFC 7231)' do
+          UserConnection.stubs.get('/users/55') { [414, {}, ''] }
+
+          expect {
+            user = User.find({ id: 55 })
+          }.to raise_error(ActiveRest::Error::URITooLong)
+
+          UserConnection.stubs.verify_stubbed_calls
+        end
+
+        it 'Unsupported Media Type' do
+          UserConnection.stubs.get('/users/55') { [415, {}, ''] }
+
+          expect {
+            user = User.find({ id: 55 })
+          }.to raise_error(ActiveRest::Error::UnsupportedMediaType)
+
+          UserConnection.stubs.verify_stubbed_calls
+        end
+
+        it 'Range Not Satisfiable (RFC 7233)' do
+          UserConnection.stubs.get('/users/55') { [416, {}, ''] }
+
+          expect {
+            user = User.find({ id: 55 })
+          }.to raise_error(ActiveRest::Error::RangeNotSatisfiable)
+
+          UserConnection.stubs.verify_stubbed_calls
+        end
+
+        it 'Expectation Failed' do
+          UserConnection.stubs.get('/users/55') { [417, {}, ''] }
+
+          expect {
+            user = User.find({ id: 55 })
+          }.to raise_error(ActiveRest::Error::ExpectationFailed)
+
+          UserConnection.stubs.verify_stubbed_calls
+        end
+
+        it 'I\'m a teapot (RFC 2324)' do
+          UserConnection.stubs.get('/users/55') { [418, {}, ''] }
+
+          expect {
+            user = User.find({ id: 55 })
+          }.to raise_error(ActiveRest::Error::IMaTeapot)
+
+          UserConnection.stubs.verify_stubbed_calls
+        end
+
+        it 'Misdirected Request (RFC 7540)' do
+          UserConnection.stubs.get('/users/55') { [421, {}, ''] }
+
+          expect {
+            user = User.find({ id: 55 })
+          }.to raise_error(ActiveRest::Error::MisdirectedRequest)
+
+          UserConnection.stubs.verify_stubbed_calls
+        end
+
+        it 'Unprocessable Entity (WebDAV; RFC 4918)' do
+          UserConnection.stubs.get('/users/55') { [422, {}, ''] }
+
+          expect {
+            user = User.find({ id: 55 })
+          }.to raise_error(ActiveRest::Error::UnprocessableEntity)
+
+          UserConnection.stubs.verify_stubbed_calls
+        end
+
+        it 'Locked (WebDAV; RFC 4918)' do
+          UserConnection.stubs.get('/users/55') { [423, {}, ''] }
+
+          expect {
+            user = User.find({ id: 55 })
+          }.to raise_error(ActiveRest::Error::Locked)
+
+          UserConnection.stubs.verify_stubbed_calls
+        end
+
+        it 'Failed Dependency (WebDAV; RFC 4918)' do
+          UserConnection.stubs.get('/users/55') { [424, {}, ''] }
+
+          expect {
+            user = User.find({ id: 55 })
+          }.to raise_error(ActiveRest::Error::FailedDependency)
+
+          UserConnection.stubs.verify_stubbed_calls
+        end
+
+        it 'Upgrade Required' do
+          UserConnection.stubs.get('/users/55') { [426, {}, ''] }
+
+          expect {
+            user = User.find({ id: 55 })
+          }.to raise_error(ActiveRest::Error::UpgradeRequired)
+
+          UserConnection.stubs.verify_stubbed_calls
+        end
+
+        it 'Precondition Required (RFC 6585)' do
+          UserConnection.stubs.get('/users/55') { [428, {}, ''] }
+
+          expect {
+            user = User.find({ id: 55 })
+          }.to raise_error(ActiveRest::Error::PreconditionRequired)
+
+          UserConnection.stubs.verify_stubbed_calls
+        end
+
+        it 'Too Many Requests (RFC 6585)' do
+          UserConnection.stubs.get('/users/55') { [429, {}, ''] }
+
+          expect {
+            user = User.find({ id: 55 })
+          }.to raise_error(ActiveRest::Error::TooManyRequests)
+
+          UserConnection.stubs.verify_stubbed_calls
+        end
+
+        it 'Request Header Fields Too Large (RFC 6585)' do
+          UserConnection.stubs.get('/users/55') { [431, {}, ''] }
+
+          expect {
+            user = User.find({ id: 55 })
+          }.to raise_error(ActiveRest::Error::RequestHeaderFieldsTooLarge)
+
+          UserConnection.stubs.verify_stubbed_calls
+        end
+
+        it 'Unavailable For Legal Reasons' do
+          UserConnection.stubs.get('/users/55') { [451, {}, ''] }
+
+          expect {
+            user = User.find({ id: 55 })
+          }.to raise_error(ActiveRest::Error::UnavailableForLegalReasons)
+
+          UserConnection.stubs.verify_stubbed_calls
+        end
+
+      end
+
+      context "Server Error" do
+        it "Internal Server Error" do
+          UserConnection.stubs.get('/users/666') { [500, {}, ''] }
+
+          expect {
+            user = User.find({ id: 666 })
+          }.to raise_error(ActiveRest::Error::InternalServerError)
+
+          UserConnection.stubs.verify_stubbed_calls
+        end
+
+        it 'Not Implemented' do
+          UserConnection.stubs.get('/users/666') { [501, {}, ''] }
+
+          expect {
+            user = User.find({ id: 666 })
+          }.to raise_error(ActiveRest::Error::NotImplemented)
+
+          UserConnection.stubs.verify_stubbed_calls
+        end
+        it 'Bad Gateway' do
+          UserConnection.stubs.get('/users/666') { [502, {}, ''] }
+
+          expect {
+            user = User.find({ id: 666 })
+          }.to raise_error(ActiveRest::Error::BadGateway)
+
+          UserConnection.stubs.verify_stubbed_calls
+        end
+        it 'Service Unavailable' do
+          UserConnection.stubs.get('/users/666') { [503, {}, ''] }
+
+          expect {
+            user = User.find({ id: 666 })
+          }.to raise_error(ActiveRest::Error::ServiceUnavailable)
+
+          UserConnection.stubs.verify_stubbed_calls
+        end
+        it 'Gateway Timeout' do
+          UserConnection.stubs.get('/users/666') { [504, {}, ''] }
+
+          expect {
+            user = User.find({ id: 666 })
+          }.to raise_error(ActiveRest::Error::GatewayTimeout)
+
+          UserConnection.stubs.verify_stubbed_calls
+        end
+        it 'HTTP Version Not Supported' do
+          UserConnection.stubs.get('/users/666') { [505, {}, ''] }
+
+          expect {
+            user = User.find({ id: 666 })
+          }.to raise_error(ActiveRest::Error::HTTPVersionNotSupported)
+
+          UserConnection.stubs.verify_stubbed_calls
+        end
+        it 'Variant Also Negotiates (RFC 2295)' do
+          UserConnection.stubs.get('/users/666') { [506, {}, ''] }
+
+          expect {
+            user = User.find({ id: 666 })
+          }.to raise_error(ActiveRest::Error::VariantAlsoNegotiates)
+
+          UserConnection.stubs.verify_stubbed_calls
+        end
+        it 'Insufficient Storage (WebDAV; RFC 4918)' do
+          UserConnection.stubs.get('/users/666') { [507, {}, ''] }
+
+          expect {
+            user = User.find({ id: 666 })
+          }.to raise_error(ActiveRest::Error::InsufficientStorage)
+
+          UserConnection.stubs.verify_stubbed_calls
+        end
+        it 'Loop Detected (WebDAV; RFC 5842)' do
+          UserConnection.stubs.get('/users/666') { [508, {}, ''] }
+
+          expect {
+            user = User.find({ id: 666 })
+          }.to raise_error(ActiveRest::Error::LoopDetected)
+
+          UserConnection.stubs.verify_stubbed_calls
+        end
+        it 'Not Extended (RFC 2774)' do
+          UserConnection.stubs.get('/users/666') { [510, {}, ''] }
+
+          expect {
+            user = User.find({ id: 666 })
+          }.to raise_error(ActiveRest::Error::NotExtended)
+
+          UserConnection.stubs.verify_stubbed_calls
+        end
+        it 'Network Authentication Required (RFC 6585)' do
+          UserConnection.stubs.get('/users/666') { [511, {}, ''] }
+
+          expect {
+            user = User.find({ id: 666 })
+          }.to raise_error(ActiveRest::Error::NetworkAuthenticationRequired)
+
+          UserConnection.stubs.verify_stubbed_calls
+        end
+      end
+
       context ".find" do
         it "get user" do
           UserConnection.stubs.get('/users/1') { [200, {}, '{"id":1,"name":"Allan","idade":24,"outher_things":["oi"]}'] }
@@ -130,26 +516,6 @@ module ActiveRest
 
           UserConnection.stubs.verify_stubbed_calls
         end
-
-        it "not found" do
-          UserConnection.stubs.get('/users/55') { [404, {}, ''] }
-
-          user = User.find({ id: 55 })
-
-          expect( user ).to be_nil
-
-          UserConnection.stubs.verify_stubbed_calls
-        end
-
-        it "server error" do
-          UserConnection.stubs.get('/users/666') { [500, {}, ''] }
-
-          expect {
-            user = User.find({ id: 666 })
-          }.to raise_error(ActiveRest::Error::ResponseError)
-
-          UserConnection.stubs.verify_stubbed_calls
-        end
       end
 
       context "#reload" do
@@ -171,10 +537,10 @@ module ActiveRest
           UserConnection.stubs.get('/users/1') { [404, {}, nil] }
 
           user = User.new(id: 1)
-          user.reload
 
-          expect( user ).to be_errors
-          expect( user.errors.first ).to eq(ActiveRest::Response.messages(404))
+          expect {
+            user.reload
+          }.to raise_error(ActiveRest::Error::NotFound)
 
           UserConnection.stubs.verify_stubbed_calls
         end
@@ -186,7 +552,7 @@ module ActiveRest
 
           expect {
             user.reload
-          }.to raise_error(ActiveRest::Error::ResponseError)
+          }.to raise_error(ActiveRest::Error::InternalServerError)
 
           UserConnection.stubs.verify_stubbed_calls
         end

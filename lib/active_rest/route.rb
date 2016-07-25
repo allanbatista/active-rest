@@ -15,7 +15,7 @@ module ActiveRest
     end
 
     def valid_response response
-      raise ActiveRest::Error::ResponseError.new(response) unless success?(response.status)
+      raise ActiveRest::Error.by_response(response) unless success?(response.status)
     end
 
     private

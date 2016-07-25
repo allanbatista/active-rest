@@ -44,7 +44,16 @@ module ActiveRest
         self
       end
 
+      def attributes
+        self.class.attributes
+      end
+
+      def copy_from model
+        attributes.keys.each { |att| self.send("#{att}=", model.send(att)) }
+      end
+
       included do
+
         def self.attributes
           @attributes ||= {}
         end

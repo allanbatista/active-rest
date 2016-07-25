@@ -12,19 +12,27 @@ module ActiveRest
     ##
     # Faz um fetch no servidor e recarrega o objeto atual
     def reload
-      obj = self.class.find(to_remote)
+      model = self.class.find(to_remote)
 
-      if obj.nil?
-        self.add_error(Response.messages(404))        
-      elsif obj.errors?
-        self.add_errors(obj.errors)
+      if model.errors?
+        add_errors(model.errors)
       else
-        self.class.attributes.keys.each do |attribute|
-          self.send("#{attribute}=", obj.send(attribute))
-        end
+        copy_from(model)
+        persist!
       end
+      # begin
+      #   model = self.class.find(to_remote)
 
-      persist!
+      #   if model.errors?
+      #     add_errors(model.errors)
+      #   else
+      #     copy_from(model)
+      #     persist!
+      #   end
+
+      # rescue ActiveRest::Error::ResponseError => e
+      #   add_error(e.message)
+      # end
 
       self
     end
