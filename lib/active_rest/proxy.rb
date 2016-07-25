@@ -1,5 +1,7 @@
 module ActiveRest
   class Proxy
+    include List
+
     attr_reader :model, :routes
 
     def initialize model
@@ -8,13 +10,6 @@ module ActiveRest
 
     def routes
       @routes ||= {}
-    end
-
-    def list limit = 20, offset = 1, options = {}
-      route  = routes[:list]
-      response = @model.connection.send( route.method, ProxyHelper.replace_path_attributes(options, route.path), { route.options[:offset] => offset.to_i, route.options[:limit] => limit.to_i } )
-      route.valid_response(response)
-      response
     end
 
     def find options = {}
