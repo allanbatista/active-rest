@@ -20,19 +20,6 @@ module ActiveRest
         copy_from(model)
         persist!
       end
-      # begin
-      #   model = self.class.find(to_remote)
-
-      #   if model.errors?
-      #     add_errors(model.errors)
-      #   else
-      #     copy_from(model)
-      #     persist!
-      #   end
-
-      # rescue ActiveRest::Error::ResponseError => e
-      #   add_error(e.message)
-      # end
 
       self
     end
