@@ -13,7 +13,7 @@ module ActiveRest
 
         class User
           include ActiveRest::Model
-          include ActiveRest::Model::BasicJsonParser
+          include ActiveRest::Model::Parser::JSON
 
           connection UserConnection
 
@@ -659,7 +659,7 @@ module ActiveRest
 
           class ::Brand
             include ActiveRest::Model
-            include ActiveRest::Model::BasicJsonParser
+            include ActiveRest::Model::Parser::JSON
 
             connection BelongsToConnection
 
@@ -671,7 +671,7 @@ module ActiveRest
 
           class ::Product
             include ActiveRest::Model
-            include ActiveRest::Model::BasicJsonParser
+            include ActiveRest::Model::Parser::JSON
 
             connection BelongsToConnection
 
@@ -728,7 +728,7 @@ module ActiveRest
 
           class ::Tag
             include ActiveRest::Model
-            include ActiveRest::Model::BasicJsonParser
+            include ActiveRest::Model::Parser::JSON
 
             connection HasManyConnection
 
@@ -743,7 +743,7 @@ module ActiveRest
 
           class ::Post
             include ActiveRest::Model
-            include ActiveRest::Model::BasicJsonParser
+            include ActiveRest::Model::Parser::JSON
 
             connection HasManyConnection
 

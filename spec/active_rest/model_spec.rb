@@ -13,7 +13,7 @@ module ActiveRest
 
         class User
           include ActiveRest::Model
-          include ActiveRest::Model::BasicJsonParser
+          include ActiveRest::Model::Parser::JSON
 
           connection UserConnection
 
