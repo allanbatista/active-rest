@@ -1,5 +1,8 @@
 module ActiveRest
   module Model
+    ##
+    # This class represents a individual attribute of model.
+    # It should abstract how attribute appear in api and local.
     class Attribute
       attr_reader :name, :type, :default, :remote_name, :remote_type, :as
 
@@ -23,7 +26,7 @@ module ActiveRest
       private
         def normalize type, value, to
           return @default if value.nil?
-          
+         
           if type == String
             value.to_s
           elsif type == Integer
