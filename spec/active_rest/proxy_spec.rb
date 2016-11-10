@@ -75,6 +75,14 @@ module ActiveRest
           UserConnection.stubs.verify_stubbed_calls
         end
 
+        it "should list users with params" do
+          UserConnection.stubs.get('/users?page=1&per_page=20&param=test') { [200, {}, '[{"id":1,"name":"Allan","idade":24,"outher_things":["oi"]},{"id":2,"name":"Lucas","wallet":25.75}]'] }
+
+          users = User.list(param: 'test').to_a
+
+          UserConnection.stubs.verify_stubbed_calls
+        end
+
         it "should return ServerError" do
           UserConnection.stubs.get('/users?page=1&per_page=20') { [500, {}, nil] }
 
