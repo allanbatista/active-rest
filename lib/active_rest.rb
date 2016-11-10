@@ -1,3 +1,4 @@
+require "time"
 require "active_support"
 require "active_support/inflector"
 require "active_rest/version"

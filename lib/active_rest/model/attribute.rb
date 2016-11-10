@@ -12,6 +12,7 @@ module ActiveRest
         @default     = options.fetch(:default, nil)
         @remote_name = options.fetch(:remote_name, @name)
         @remote_type = options.fetch(:remote_type, @type)
+        @format      = options.fetch(:format, '%Y-%m-%dT%H:%M:%S%:z')
         @as          = options.fetch(:as, nil)
       end
 
@@ -33,6 +34,8 @@ module ActiveRest
             value.to_i
           elsif type == Float
             value.to_f
+          elsif type == DateTime && value.class == String
+            DateTime.strptime(value, @format)
           elsif type == Array && !@as.nil?
             value.map do |val|
               if to == :local

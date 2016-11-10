@@ -22,23 +22,25 @@ module ActiveRest
           field :idade , type: Integer
           field :wallet, type: Float, default: 0.0
           field :things, type: Array, default: [], remote_name: 'outher_things'
+          field :date  , type: DateTime
         end
       end
 
       it "should translate correct" do
-        user = User.new id: '1', name: 'Allan', idade: '24'
+        user = User.new id: '1', name: 'Allan', idade: '24', date: '2016-11-10T19:25:15-02:00'
 
         expect( user.id ).to eq(1)
         expect( user.name ).to eq('Allan')
         expect( user.idade ).to eq(24)
         expect( user.wallet ).to eq(0.0)
+        expect( user.date ).to eq( DateTime.parse('2016-11-10T19:25:15-02:00') )
       end
 
       context "attributes" do
         it "should create corrrect attributes" do
           attributes = User.attributes
 
-          expect( attributes.size ).to eq(5)
+          expect( attributes.size ).to eq(6)
           expect( attributes[:id].name ).to eq( :id )
           expect( attributes[:id].default ).to eq( nil )
           expect( attributes[:id].type ).to eq( Integer )
@@ -49,7 +51,7 @@ module ActiveRest
         context "#field" do
           class Thing
             include ActiveRest::SimpleModule
-            include ActiveRest::Model::BasicJsonParser
+            include ActiveRest::Model::Parser::JSON
 
             field :key, type: String
             field :value, type: String
@@ -57,7 +59,7 @@ module ActiveRest
 
           class ActiveRestCollectionTest
             include ActiveRest::Model
-            include ActiveRest::Model::BasicJsonParser
+            include ActiveRest::Model::Parser::JSON
 
             field :id    , type: Integer
             field :things, type: Array, as: Thing, default: []
@@ -104,7 +106,7 @@ module ActiveRest
           it "should translate correct" do
             user = User.new id: 2, name: 'Lucas', things: ['tag1', 'tag2']
 
-            expect( user.to_remote ).to eq( { 'sku' => '2', 'name' => 'Lucas', 'idade' => nil, 'wallet' => 0.0, 'outher_things' => ['tag1', 'tag2'] } )
+            expect( user.to_remote ).to eq( { 'sku' => '2', 'name' => 'Lucas', 'idade' => nil, 'wallet' => 0.0, 'outher_things' => ['tag1', 'tag2'], 'date' => nil } )
           end
         end
       end
