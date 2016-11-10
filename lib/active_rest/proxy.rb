@@ -1,4 +1,6 @@
 module ActiveRest
+  ##
+  # Proxy should abstract how interact with model with api.
   class Proxy
     include List
     include Find

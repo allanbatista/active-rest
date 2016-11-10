@@ -70,9 +70,18 @@ module ActiveRest
         Iterator.new( self )
       end
 
+      def self.list options = {}, limit = 20, offset = 1
+        response = proxy.find(limit, offset, options)
+        parse_and_initialize(:list, response.body)
+      end
+
       def self.find options
         response = proxy.find(options)
         parse_and_initialize(:find, response.body)
+      end
+
+      def self.find_or_initialize options
+        find(options) || self.new(options)
       end
 
       def self.connection connection = @connection
