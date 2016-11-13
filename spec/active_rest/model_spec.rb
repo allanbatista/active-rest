@@ -50,7 +50,7 @@ module ActiveRest
 
         context "#field" do
           class Thing
-            include ActiveRest::SimpleModule
+            include ActiveRest::SimpleModel
             include ActiveRest::Model::Parser::JSON
 
             field :key, type: String

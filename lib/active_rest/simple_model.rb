@@ -5,10 +5,10 @@ module ActiveRest
   # Exemple
   #
   #     class Thing
-  #         include ActiveRest::SimpleModule
+  #         include ActiveRest::SimpleModel
   #         field :name, type: String
   #     end
-  module SimpleModule
+  module SimpleModel
     extend  ActiveSupport::Concern
 
     include ActiveRest::Model::Field
