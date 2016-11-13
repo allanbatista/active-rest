@@ -3,7 +3,7 @@ module ActiveRest
     module Field
       extend ActiveSupport::Concern
 
-      def initialize attrs = {}
+      def initialize attrs = {}, &block
         attrs.keys.each { |key| self.send("#{key}=", attrs[key]) }
       end
 

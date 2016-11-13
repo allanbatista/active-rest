@@ -27,18 +27,19 @@ module ActiveRest
     ##
     # Deve persistir o objeto
     def save
+      raise StandardError.new("Modelo removido") if destroyed?
+
       clear_errors
 
       begin
         if persisted?
-          response = self.class.proxy.update(self)
+          self.class.proxy.update(self)
           action_name = :update
         else
-          response = self.class.proxy.create(self)
+          self.class.proxy.create(self)
           action_name = :create
         end
 
-        from_remote(self.class.parse(action_name, response.body))
         persist!
 
         true
@@ -49,8 +50,13 @@ module ActiveRest
     end
 
     def destroy
-      response = self.class.proxy.destroy(self)
-      self.class.proxy.routes[:destroy].success?(response.status)
+      begin
+        self.class.proxy.destroy(self)
+        true
+      rescue => e
+        add_errors(self.class.parse_error(e.response))
+        false
+      end
     end   
 
     def persist!
@@ -63,6 +69,14 @@ module ActiveRest
 
     def persisted?
       @persisted || false
+    end
+
+    def destroyed!
+      @destroyed = true
+    end
+
+    def destroyed?
+      @destroyed || false
     end
 
     included do
@@ -85,16 +99,6 @@ module ActiveRest
 
       def self.connection connection = @connection
         @connection = connection
-      end
-
-      ##
-      # this method expect receive a hash.
-      #
-      # example:
-      #
-      #     { "name" => "Allan" }
-      def self.parse action, body
-        raise NotImplementedError.new
       end
 
       def self.parse_and_initialize action, body

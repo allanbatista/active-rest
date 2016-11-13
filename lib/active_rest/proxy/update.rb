@@ -8,7 +8,7 @@ module ActiveRest
           route = routes[:update]
           response = method_with_body(route, model)
           route.valid_response(response)
-          response
+          model.from_remote(model.class.parse(:update, response.body))
         end
 
         def update! model

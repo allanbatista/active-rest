@@ -1,13 +1,14 @@
 module ActiveRest
   class Route
-    attr_reader :path, :method, :success, :headers, :options
+    attr_reader :path, :method, :success, :headers, :options, :parser
 
-    def initialize path, method, success = 200..299, headers = {}, options = {}
+    def initialize path, method, success = 200..299, headers = {}, options = {}, &block
       @path    = path
       @method  = method
       @success = success
       @headers = headers || {}
       @options = options || {}
+      @parser  = block
     end
 
     def success? status

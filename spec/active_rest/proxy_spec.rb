@@ -27,7 +27,9 @@ module ActiveRest
           field :wallet , type: Float, default: 0.0
           field :things , type: Array, default: [], remote_name: 'outher_things'
 
-          route :list   , '/users', success: 200..299, method: :get, options: { offset: 'page', limit: 'per_page' }
+          route :list   , '/users', success: 200..299, method: :get, options: { offset: 'page', limit: 'per_page' } do
+            debugger
+          end
           route :find   , '/users/:id', success: 200..299, method: :get
           route :create , '/users', success: 201, method: :post, data_type: :json
           route :update , '/users/:id', success: 204, method: :patch, data_type: :json
@@ -48,6 +50,7 @@ module ActiveRest
 
       context ".list" do
         it "should intialize correct route" do
+          
           route = User.proxy.routes[:list]
 
           expect( route ).to be_a Route
@@ -632,8 +635,16 @@ module ActiveRest
           user = User.new(id: 1)
 
           expect( user.destroy ).to eq(true)
+          expect( user ).to be_destroyed
 
           UserConnection.stubs.verify_stubbed_calls
+        end
+
+        it "should not try to save model when is market how destroyed" do
+          user = User.new(id: 1)
+          user.destroyed!
+
+          expect { user.save }.to raise_error StandardError
         end
       end
 
