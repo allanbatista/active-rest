@@ -53,7 +53,7 @@ module ActiveRest
           elsif type.included_modules.include?(SimpleModel)
             if to == :local
               obj = type.new
-              obj.from_remote(val)
+              obj.from_remote(value)
               return obj
             else
               return value.to_remote if value.respond_to?(:to_remote)
