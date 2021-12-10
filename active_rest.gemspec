@@ -8,6 +8,7 @@ Gem::Specification.new do |spec|
   spec.version       = ActiveRest::VERSION
   spec.authors       = ["Allan Batista", "Leonardo Teixeira"]
   spec.email         = ["allan@allanbatista.com.br", "leorodriguesrj@gmail.com"]
+  spec.summary       = "teste"
 
   spec.files         = `git ls-files -z`.split("\x0").reject { |f| f.match(%r{^(test|spec|features)/}) }
   spec.bindir        = "exe"
